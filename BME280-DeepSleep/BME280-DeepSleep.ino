@@ -26,10 +26,10 @@
 Adafruit_BME280 bme;
 
 
-const char* ssid = "<<Netzwerk-Name>>";
-const char* password = "<<Netzwerk-Passwort>>";
-const char* id = "<<Wettermonster-ID>>";
-const char* key = "<<Wettermonster-KEY>>";
+const char* ssid = "NAME DEINES WLAN";
+const char* password = "PASSWORD VOM WLAN";
+const char* id = "STATIONSNUMMER VON WETTERMONSTER";
+const char* key = "KEY DER STATION VON WETTERMONSTER";
 const int interval = 2;
 
 float temperature;
@@ -123,7 +123,6 @@ void readBME() {
   pressure = bme.readPressure() / 100.0F;
 
 }
-
 void setup() {
   Serial.begin(115200);
 
@@ -148,17 +147,28 @@ void setup() {
     Serial.println("BME280 konnte nicht gefunden werde, checke bitte die Verbindungen!");
     return;
 
+    lastMillis = millis();
+  }
 
+  if (millis() - lastMillis > (interval * 60000)) {
+  }
+  if (ESP.getFreeHeap() <= 20000) {
+    Serial.println("Der freie Heap beträgt nur noch: " + String(ESP.getFreeHeap()) + " Der ESP wird deshalb neu gestartet.");
+    ESP.restart();
   }
 
   delay(100);
 
+
   readBME();
+  bme.begin(0x76);
   sendToWettermonster();
-  Serial.println("Going into deep sleep for 900 seconds");
-  ESP.deepSleep(900e6); // 20e6 is 20 microseconds
+  lastMillis = millis();
+  Serial.println("Going into deep sleep for 1500 seconds");
+  ESP.deepSleep(1500e6); // 20e6 is 20 microseconds
   WiFi.begin();
 }
 
 void loop() {
 }
+
